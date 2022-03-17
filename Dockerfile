@@ -9,8 +9,7 @@ RUN apt-get update \
 	&& curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | gpg --dearmor -o /usr/share/keyrings/cloudflare-client-archive-keyring.gpg \
 	&& echo "deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-client-archive-keyring.gpg] https://pkg.cloudflareclient.com focal main" | tee /etc/apt/sources.list.d/cloudflare-client.list > /dev/null \
 	&& apt-get update \
-	&& apt-get install -y cloudflare-warp \
-	&& mkdir -p /var/lib/cloudflare-warp
+	&& apt-get install -y cloudflare-warp
 
 COPY cloudflare-warp-supervisord.conf /etc/supervisor/conf.d/
 COPY cloudflare-warp-startup.sh /usr/lib/supervisor/scripts/
