@@ -14,5 +14,4 @@ RUN apt-get update \
 COPY cloudflare-warp-supervisord.conf /etc/supervisor/conf.d/
 COPY cloudflare-warp-startup.sh /usr/lib/supervisor/scripts/
 
-ENTRYPOINT ["/usr/bin/supervisord"]
-CMD ["--nodaemon"]
+CMD ["/usr/bin/supervisord", "--nodaemon"]
