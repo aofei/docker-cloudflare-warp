@@ -1,17 +1,20 @@
-FROM ubuntu:20.04
+FROM alpine
 
 LABEL maintainer="aofei@aofeisheng.com"
 
-ARG DEBIAN_FRONTEND=noninteractive
+RUN export BUILD_ONLY_PKGS="ca-certificates curl" \
+	&& apk add --no-cache $BUILD_ONLY_PKGS \
+	&& export GLIBC_VERSION=2.34-r0 \
+	&& for pkg in glibc-$GLIBC_VERSION glibc-bin-$GLIBC_VERSION; do curl -fsSL https://github.com/sgerrand/alpine-pkg-glibc/releases/download/$GLIBC_VERSION/$pkg.apk -o /tmp/$pkg.apk; done \
+	&& apk add --no-cache --allow-untrusted /tmp/*.apk \
+	&& /usr/glibc-compat/sbin/ldconfig /lib /usr/glibc-compat/lib \
+	&& apk add --no-cache dbus-libs iptables ip6tables supervisor \
+	&& rm -rf /tmp/* \
+	&& apk del $BUILD_ONLY_PKGS
 
-RUN apt-get update \
-	&& apt-get install -y curl gnupg2 iproute2 iptables supervisor \
-	&& curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | gpg --dearmor -o /usr/share/keyrings/cloudflare-client-archive-keyring.gpg \
-	&& echo "deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-client-archive-keyring.gpg] https://pkg.cloudflareclient.com focal main" | tee /etc/apt/sources.list.d/cloudflare-client.list > /dev/null \
-	&& apt-get update \
-	&& apt-get install -y cloudflare-warp
-
-COPY cloudflare-warp-supervisord.conf /etc/supervisor/conf.d/
+COPY warp-svc /usr/bin/
+COPY warp-cli /usr/bin/
+COPY cloudflare-warp-supervisor.ini /etc/supervisor.d/
 COPY cloudflare-warp-startup.sh /usr/lib/supervisor/scripts/
 
 CMD ["/usr/bin/supervisord", "--nodaemon"]
