@@ -12,8 +12,7 @@ RUN export BUILD_ONLY_PKGS="ca-certificates curl" \
 	&& rm -rf /tmp/* \
 	&& apk del $BUILD_ONLY_PKGS
 
-COPY warp-svc /usr/bin/
-COPY warp-cli /usr/bin/
+COPY warp-cli warp-svc /usr/bin/
 COPY cloudflare-warp-supervisor.ini /etc/supervisor.d/
 COPY cloudflare-warp-startup.sh /usr/lib/supervisor/scripts/
 
