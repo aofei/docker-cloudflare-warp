@@ -1,0 +1,20 @@
+#!/sbin/openrc-run
+description="Cloudflare WARP"
+command="/usr/bin/warp-svc"
+supervisor="supervise-daemon"
+depend() {
+	need net
+	use dns logger netmount
+}
+start_post() {
+	ebegin "Connecting $SVCNAME"
+	ewaitfile 10 /run/cloudflare-warp/warp_service
+	if [[ "$(/usr/bin/warp-cli --accept-tos account)" == *"Missing"* ]]; then
+		/usr/bin/warp-cli --accept-tos register > /dev/null || return 1
+		/usr/bin/warp-cli --accept-tos enable-always-on > /dev/null || return 1
+	fi
+	/usr/bin/warp-cli --accept-tos connect > /dev/null || return 1
+	/sbin/iptables -t nat -A POSTROUTING -o CloudflareWARP -j MASQUERADE || return 1
+	/sbin/ip6tables -t nat -A POSTROUTING -o CloudflareWARP -j MASQUERADE || return 1
+	eend 0
+}
