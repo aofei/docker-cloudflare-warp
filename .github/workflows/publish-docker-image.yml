@@ -18,14 +18,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y cloudflare-warp
           cp /usr/bin/warp-cli /usr/bin/warp-svc .
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Build and push Docker image
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ secrets.DOCKER_USERNAME }}/cloudflare-warp
+        run: |
+          DOCKER_IMAGE_REPO=${{secrets.DOCKER_USERNAME}}/cloudflare-warp
+          DOCKER_IMAGE_TAG=$(./warp-cli --version | sed "s/WARP //")
+          DOCKER_IMAGE_TAG_HTTP_CODE=$(curl -sL -w "%{http_code}" -o /dev/null https://hub.docker.com/v2/repositories/$DOCKER_IMAGE_REPO/tags/$DOCKER_IMAGE_TAG/)
+          sudo docker login --username ${{secrets.DOCKER_USERNAME}} --password ${{secrets.DOCKER_PASSWORD}}
+          sudo docker build --tag $DOCKER_IMAGE_REPO:$DOCKER_IMAGE_TAG --tag $DOCKER_IMAGE_REPO:latest .
+          if [[ ${{github.event_name}} != "pull_request" && $DOCKER_IMAGE_TAG_HTTP_CODE == 404 ]]; then
+            for IMG in $DOCKER_IMAGE_REPO:$DOCKER_IMAGE_TAG $DOCKER_IMAGE_REPO:latest; do
+              sudo docker push $IMG
+            done
+          fi
