@@ -15,13 +15,13 @@ ARG GLIBC_VERSION=2.34-r0
 COPY --from=build /usr/bin/warp-cli /usr/bin/warp-svc /usr/local/bin/
 COPY init.d/ /etc/init.d/
 
-RUN apk add --no-cache dbus-libs iptables ip6tables openrc
+RUN apk add --no-cache dante-server dbus-libs iptables ip6tables openrc && mv /etc/sockd.conf /etc/sockd.conf.example
 RUN export GLIBC_PKG_DIR=$(mktemp -d) \
 	&& for PKG in glibc-$GLIBC_VERSION.apk glibc-bin-$GLIBC_VERSION.apk; do wget -q --directory-prefix $GLIBC_PKG_DIR https://github.com/sgerrand/alpine-pkg-glibc/releases/download/$GLIBC_VERSION/$PKG; done \
 	&& apk add --no-cache --allow-untrusted $GLIBC_PKG_DIR/* \
 	&& rm -rf $GLIBC_PKG_DIR \
 	&& /usr/glibc-compat/sbin/ldconfig /lib /usr/glibc-compat/lib
 
-RUN rc-update add cloudflare-warp default
+RUN for SVC in cloudflare-warp danted; do rc-update add $SVC default; done
 
 CMD ["/sbin/openrc-init"]
