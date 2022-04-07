@@ -22,8 +22,16 @@ jobs:
         id: prepare-docker-image-build-metadata
         run: |
           DOCKER_IMAGE_TAG=$(./warp-cli --version | sed "s/WARP //")
-          DOCKER_IMAGE_BUILD_ARG_CLOUDFLARE_WARP_VERSION=$(dpkg -s cloudflare-warp | grep Version | sed "s/Version //")
+          if [[ ${{github.event_name}} != "pull_request" ]]; then
+            DOCKER_IMAGE_TAG_DOCKER_HUB_EXISTS=$(docker manifest inspect ${{secrets.DOCKER_USERNAME}}/cloudflare-warp:$DOCKER_IMAGE_TAG &> /dev/null && echo 1 || echo 0)
+            DOCKER_IMAGE_TAG_GITHUB_CONTAINER_REGISTRY_EXISTS=$(docker manifest inspect ghcr.io/${{github.repository_owner}}/cloudflare-warp:$DOCKER_IMAGE_TAG &> /dev/null && echo 1 || echo 0)
+            DOCKER_IMAGE_TAG_PUSHABLE=$([[ $DOCKER_IMAGE_TAG_DOCKER_HUB_EXISTS == 0 || $DOCKER_IMAGE_TAG_GITHUB_CONTAINER_REGISTRY_EXISTS == 0 ]] && echo 1 || echo 0)
+          else
+            DOCKER_IMAGE_TAG_PUSHABLE=0
+          fi
+          DOCKER_IMAGE_BUILD_ARG_CLOUDFLARE_WARP_VERSION=$(dpkg -s cloudflare-warp | grep "Version: " | sed "s/Version: //")
           echo "::set-output name=docker-image-tag::$DOCKER_IMAGE_TAG"
+          echo "::set-output name=docker-image-tag-pushable::$DOCKER_IMAGE_TAG_PUSHABLE"
           echo "::set-output name=docker-image-build-arg-cloudflare-warp-version::$DOCKER_IMAGE_BUILD_ARG_CLOUDFLARE_WARP_VERSION"
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
@@ -37,11 +45,12 @@ jobs:
           username: ${{github.actor}}
           password: ${{github.token}}
       - name: Build and push Docker image
+        if: ${{github.event_name != 'schedule' || steps.prepare-docker-image-build-metadata.outputs.docker-image-tag-pushable == 1}}
         uses: docker/build-push-action@v2
         with:
           context: .
           build-args: CLOUDFLARE_WARP_VERSION=${{steps.prepare-docker-image-build-metadata.outputs.docker-image-build-arg-cloudflare-warp-version}}
-          push: ${{github.event_name != 'pull_request'}}
+          push: ${{steps.prepare-docker-image-build-metadata.outputs.docker-image-tag-pushable == 1}}
           tags: |
             ${{secrets.DOCKER_USERNAME}}/cloudflare-warp:${{steps.prepare-docker-image-build-metadata.outputs.docker-image-tag}}
             ${{secrets.DOCKER_USERNAME}}/cloudflare-warp:latest
