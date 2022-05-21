@@ -25,7 +25,7 @@ jobs:
           if [[ ${{github.event_name}} != "pull_request" ]]; then
             DOCKER_IMAGE_TAG_DOCKER_HUB_EXISTS=$(docker manifest inspect ${{secrets.DOCKER_USERNAME}}/cloudflare-warp:$DOCKER_IMAGE_TAG &> /dev/null && echo 1 || echo 0)
             DOCKER_IMAGE_TAG_GITHUB_CONTAINER_REGISTRY_EXISTS=$(docker manifest inspect ghcr.io/${{github.repository_owner}}/cloudflare-warp:$DOCKER_IMAGE_TAG &> /dev/null && echo 1 || echo 0)
-            DOCKER_IMAGE_TAG_PUSHABLE=$([[ $DOCKER_IMAGE_TAG_DOCKER_HUB_EXISTS == 0 || $DOCKER_IMAGE_TAG_GITHUB_CONTAINER_REGISTRY_EXISTS == 0 ]] && echo 1 || echo 0)
+            DOCKER_IMAGE_TAG_PUSHABLE=$([[ $DOCKER_IMAGE_TAG_DOCKER_HUB_EXISTS -eq 0 || $DOCKER_IMAGE_TAG_GITHUB_CONTAINER_REGISTRY_EXISTS -eq 0 ]] && echo 1 || echo 0)
           else
             DOCKER_IMAGE_TAG_PUSHABLE=0
           fi
