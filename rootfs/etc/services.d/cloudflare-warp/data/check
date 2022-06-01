@@ -8,8 +8,8 @@ function check_exit_code {
 	fi
 }
 trap check_exit_code EXIT
-until [[ -S /run/cloudflare-warp/warp_service ]]; do sleep 1; done
-if [[ ! -f /var/lib/cloudflare-warp/reg.json ]]; then
+while [[ ! -S /run/cloudflare-warp/warp_service ]]; do sleep 1; done
+while [[ ! -f /var/lib/cloudflare-warp/reg.json ]]; do
 	if [[ ! -z $CLOUDFLARE_WARP_ENDPOINT ]]; then
 		/usr/local/bin/warp-cli --accept-tos set-custom-endpoint $CLOUDFLARE_WARP_ENDPOINT
 	fi
@@ -18,8 +18,8 @@ if [[ ! -f /var/lib/cloudflare-warp/reg.json ]]; then
 		/usr/local/bin/warp-cli --accept-tos set-license $CLOUDFLARE_WARP_LICENSE
 	fi
 	/usr/local/bin/warp-cli --accept-tos enable-always-on
-fi
+done
 /usr/local/bin/warp-cli --accept-tos connect
-until [[ -d /sys/class/net/CloudflareWARP ]]; do sleep 1; done
+while [[ ! -d /sys/class/net/CloudflareWARP ]]; do sleep 1; done
 /sbin/iptables -t nat -A POSTROUTING -o CloudflareWARP -j MASQUERADE
 /sbin/ip6tables -t nat -A POSTROUTING -o CloudflareWARP -j MASQUERADE
