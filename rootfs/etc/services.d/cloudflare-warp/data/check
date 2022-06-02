@@ -21,3 +21,4 @@ while [[ ! -f /var/lib/cloudflare-warp/reg.json ]]; do
 done
 /usr/local/bin/warp-cli --accept-tos connect
 while [[ ! -d /sys/class/net/CloudflareWARP ]]; do sleep 1; done
+while ! nc -z 1.1.1.1 53; do sleep 1; done
