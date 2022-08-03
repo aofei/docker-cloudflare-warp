@@ -10,7 +10,7 @@ RUN export S6_OVERLAY_ROOTFS_DIR=/usr/local/src/s6-overlay-rootfs/ \
 RUN curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | gpg --dearmor -o /usr/share/keyrings/cloudflare-client-archive-keyring.gpg \
 	&& echo "deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-client-archive-keyring.gpg] https://pkg.cloudflareclient.com focal main" > /etc/apt/sources.list.d/cloudflare-client.list \
 	&& apt-get update \
-	&& apt-get install -y cloudflare-warp$([ ! -z $CLOUDFLARE_WARP_VERSION ] && echo "=$CLOUDFLARE_WARP_VERSION")
+	&& apt-get install -y cloudflare-warp${CLOUDFLARE_WARP_VERSION:+=$CLOUDFLARE_WARP_VERSION}
 
 FROM alpine
 
