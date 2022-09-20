@@ -21,7 +21,7 @@ jobs:
       - name: Prepare Docker image build metadata
         id: prepare-docker-image-build-metadata
         run: |
-          DOCKER_IMAGE_TAG=$(./warp-cli --version | sed "s/WARP //")
+          DOCKER_IMAGE_TAG=$(./warp-cli --version | sed -E "s/(WARP|warp-cli) //")
           if [[ ${{github.event_name}} != "pull_request" ]]; then
             DOCKER_IMAGE_TAG_DOCKER_HUB_EXISTS=$(docker manifest inspect ${{secrets.DOCKER_USERNAME}}/cloudflare-warp:$DOCKER_IMAGE_TAG &> /dev/null && echo 1 || echo 0)
             DOCKER_IMAGE_TAG_GITHUB_CONTAINER_REGISTRY_EXISTS=$(docker manifest inspect ghcr.io/${{github.repository_owner}}/cloudflare-warp:$DOCKER_IMAGE_TAG &> /dev/null && echo 1 || echo 0)
