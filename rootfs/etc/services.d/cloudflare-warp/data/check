@@ -17,7 +17,6 @@ while [[ ! -f /var/lib/cloudflare-warp/reg.json ]]; do
 	if [[ ! -z $CLOUDFLARE_WARP_LICENSE ]]; then
 		/usr/local/bin/warp-cli --accept-tos set-license $CLOUDFLARE_WARP_LICENSE
 	fi
-	/usr/local/bin/warp-cli --accept-tos enable-always-on
 done
 /usr/local/bin/warp-cli --accept-tos connect
 while [[ ! -d /sys/class/net/CloudflareWARP ]]; do sleep 0.1; done
