@@ -23,7 +23,7 @@ COPY rootfs/ /
 RUN apk add --no-cache dbus-libs
 RUN export GLIBC_PKG_DIR=$(mktemp -d) \
 	&& for PKG in glibc-$GLIBC_VERSION.apk glibc-bin-$GLIBC_VERSION.apk; do wget -q --directory-prefix $GLIBC_PKG_DIR https://github.com/sgerrand/alpine-pkg-glibc/releases/download/$GLIBC_VERSION/$PKG; done \
-	&& apk add --no-cache --allow-untrusted $GLIBC_PKG_DIR/* \
+	&& apk add --no-cache --allow-untrusted --force-overwrite $GLIBC_PKG_DIR/* \
 	&& rm -rf $GLIBC_PKG_DIR \
 	&& /usr/glibc-compat/sbin/ldconfig /lib /usr/glibc-compat/lib
 
