@@ -13,7 +13,7 @@ while [[ ! -f /var/lib/cloudflare-warp/reg.json ]]; do
 	if [[ ! -z $CLOUDFLARE_WARP_ENDPOINT ]]; then
 		/usr/local/bin/warp-cli --accept-tos set-custom-endpoint $CLOUDFLARE_WARP_ENDPOINT
 	fi
-	/usr/local/bin/warp-cli --accept-tos register
+	/usr/local/bin/warp-cli --accept-tos register || sleep 5
 done
 /usr/local/bin/warp-cli --accept-tos connect
 while [[ ! -d /sys/class/net/CloudflareWARP ]]; do sleep 0.1; done
