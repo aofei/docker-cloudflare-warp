@@ -16,7 +16,7 @@ ARG GLIBC_VERSION=2.34-r0
 COPY --from=build /usr/bin/warp-cli /usr/bin/warp-svc /usr/local/bin/
 COPY rootfs/ /
 
-RUN apk add --no-cache dbus-libs
+RUN apk add --no-cache nftables dbus-libs
 RUN for TARBALL in s6-overlay-noarch.tar.xz s6-overlay-x86_64.tar.xz s6-overlay-symlinks-noarch.tar.xz s6-overlay-symlinks-arch.tar.xz; do wget -qO- https://github.com/just-containers/s6-overlay/releases/download/v$S6_OVERLAY_VERSION/$TARBALL | tar -xpJ -C /; done
 RUN export GLIBC_PKG_DIR=$(mktemp -d) \
 	&& for PKG in glibc-$GLIBC_VERSION.apk glibc-bin-$GLIBC_VERSION.apk; do wget -q --directory-prefix $GLIBC_PKG_DIR https://github.com/sgerrand/alpine-pkg-glibc/releases/download/$GLIBC_VERSION/$PKG; done \
