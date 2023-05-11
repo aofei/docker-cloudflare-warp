@@ -10,9 +10,6 @@ function check_exit_code {
 trap check_exit_code EXIT
 while [[ ! -S /run/cloudflare-warp/warp_service ]]; do sleep 0.1; done
 while [[ ! -f /var/lib/cloudflare-warp/reg.json ]]; do
-	if [[ ! -z $CLOUDFLARE_WARP_ENDPOINT ]]; then
-		/usr/local/bin/warp-cli --accept-tos set-custom-endpoint $CLOUDFLARE_WARP_ENDPOINT
-	fi
 	/usr/local/bin/warp-cli --accept-tos register || sleep 5
 done
 /usr/local/bin/warp-cli --accept-tos connect
