@@ -8,7 +8,7 @@ RUN curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | gpg --dearmor -o /u
 	&& apt-get update \
 	&& apt-get install -y cloudflare-warp${CLOUDFLARE_WARP_VERSION:+=$CLOUDFLARE_WARP_VERSION}
 
-FROM alpine:3.18
+FROM alpine:3.17
 
 ARG S6_OVERLAY_VERSION=3.1.2.1
 ARG GLIBC_VERSION=2.34-r0
