@@ -10,8 +10,8 @@ RUN curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | gpg --dearmor -o /u
 
 FROM alpine:3.18
 
-ARG S6_OVERLAY_VERSION=3.1.2.1
-ARG GLIBC_VERSION=2.34-r0
+ARG S6_OVERLAY_VERSION=3.1.5.0
+ARG GLIBC_VERSION=2.35-r1
 
 COPY --from=build /usr/bin/warp-cli /usr/bin/warp-svc /usr/local/bin/
 COPY rootfs/ /
