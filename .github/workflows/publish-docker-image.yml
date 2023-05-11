@@ -22,16 +22,8 @@ jobs:
         id: prepare-docker-image-build-metadata
         run: |
           DOCKER_IMAGE_TAG=$(./warp-cli --version | sed -E "s/(WARP|warp-cli) //")
-          if [[ ${{github.event_name}} != "pull_request" ]]; then
-            DOCKER_IMAGE_TAG_DOCKER_HUB_EXISTS=$(docker manifest inspect ${{secrets.DOCKER_USERNAME}}/cloudflare-warp:$DOCKER_IMAGE_TAG &> /dev/null && echo 1 || echo 0)
-            DOCKER_IMAGE_TAG_GITHUB_CONTAINER_REGISTRY_EXISTS=$(docker manifest inspect ghcr.io/${{github.repository_owner}}/cloudflare-warp:$DOCKER_IMAGE_TAG &> /dev/null && echo 1 || echo 0)
-            DOCKER_IMAGE_TAG_PUSHABLE=$([[ $DOCKER_IMAGE_TAG_DOCKER_HUB_EXISTS -eq 0 || $DOCKER_IMAGE_TAG_GITHUB_CONTAINER_REGISTRY_EXISTS -eq 0 ]] && echo 1 || echo 0)
-          else
-            DOCKER_IMAGE_TAG_PUSHABLE=0
-          fi
           DOCKER_IMAGE_BUILD_ARG_CLOUDFLARE_WARP_VERSION=$(dpkg -s cloudflare-warp | grep "Version: " | sed "s/Version: //")
           echo "DOCKER_IMAGE_TAG=$DOCKER_IMAGE_TAG" >> $GITHUB_OUTPUT
-          echo "DOCKER_IMAGE_TAG_PUSHABLE=$DOCKER_IMAGE_TAG_PUSHABLE" >> $GITHUB_OUTPUT
           echo "DOCKER_IMAGE_BUILD_ARG_CLOUDFLARE_WARP_VERSION=$DOCKER_IMAGE_BUILD_ARG_CLOUDFLARE_WARP_VERSION" >> $GITHUB_OUTPUT
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
@@ -45,12 +37,11 @@ jobs:
           username: ${{github.actor}}
           password: ${{github.token}}
       - name: Build and push Docker image
-        if: ${{github.event_name != 'schedule' || steps.prepare-docker-image-build-metadata.outputs.DOCKER_IMAGE_TAG_PUSHABLE == 1}}
         uses: docker/build-push-action@v3
         with:
           context: .
           build-args: CLOUDFLARE_WARP_VERSION=${{steps.prepare-docker-image-build-metadata.outputs.DOCKER_IMAGE_BUILD_ARG_CLOUDFLARE_WARP_VERSION}}
-          push: ${{steps.prepare-docker-image-build-metadata.outputs.DOCKER_IMAGE_TAG_PUSHABLE == 1}}
+          push: ${{github.event_name != 'pull_request'}}
           tags: |
             ${{secrets.DOCKER_USERNAME}}/cloudflare-warp:${{steps.prepare-docker-image-build-metadata.outputs.DOCKER_IMAGE_TAG}}
             ${{secrets.DOCKER_USERNAME}}/cloudflare-warp:latest
