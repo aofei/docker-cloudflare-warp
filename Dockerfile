@@ -11,7 +11,7 @@ RUN apt-get install -y cloudflare-warp${CLOUDFLARE_WARP_VERSION:+=$CLOUDFLARE_WA
 
 FROM alpine:3.17
 
-ARG S6_OVERLAY_VERSION=3.1.5.0
+ARG S6_OVERLAY_VERSION=3.1.6.0
 ARG GLIBC_VERSION=2.34-r0
 
 COPY --from=build /usr/bin/warp-cli /usr/bin/warp-svc /usr/local/bin/
