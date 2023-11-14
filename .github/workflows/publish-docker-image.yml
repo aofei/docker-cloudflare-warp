@@ -16,7 +16,7 @@ jobs:
           curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloudflare-client-archive-keyring.gpg
           echo "deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-client-archive-keyring.gpg] https://pkg.cloudflareclient.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/cloudflare-client.list > /dev/null
           sudo apt-get update
-          sudo apt-get install -y cloudflare-warp
+          sudo apt-get install -y --no-install-recommends cloudflare-warp
           cp /usr/bin/warp-cli /usr/bin/warp-svc .
       - name: Prepare Docker image build metadata
         id: prepare-docker-image-build-metadata
