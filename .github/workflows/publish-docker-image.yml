@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install Cloudflare WARP
         run: |
           curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloudflare-client-archive-keyring.gpg
@@ -25,25 +25,18 @@ jobs:
           DOCKER_IMAGE_BUILD_ARG_CLOUDFLARE_WARP_VERSION=$(dpkg -s cloudflare-warp | grep "Version: " | sed "s/Version: //")
           echo "DOCKER_IMAGE_TAG=$DOCKER_IMAGE_TAG" >> $GITHUB_OUTPUT
           echo "DOCKER_IMAGE_BUILD_ARG_CLOUDFLARE_WARP_VERSION=$DOCKER_IMAGE_BUILD_ARG_CLOUDFLARE_WARP_VERSION" >> $GITHUB_OUTPUT
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{secrets.DOCKER_USERNAME}}
-          password: ${{secrets.DOCKER_PASSWORD}}
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{github.actor}}
           password: ${{github.token}}
       - name: Build and push Docker image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           context: .
           build-args: CLOUDFLARE_WARP_VERSION=${{steps.prepare-docker-image-build-metadata.outputs.DOCKER_IMAGE_BUILD_ARG_CLOUDFLARE_WARP_VERSION}}
           push: ${{github.event_name != 'pull_request'}}
           tags: |
-            ${{secrets.DOCKER_USERNAME}}/cloudflare-warp:${{steps.prepare-docker-image-build-metadata.outputs.DOCKER_IMAGE_TAG}}
-            ${{secrets.DOCKER_USERNAME}}/cloudflare-warp:latest
             ghcr.io/${{github.repository_owner}}/cloudflare-warp:${{steps.prepare-docker-image-build-metadata.outputs.DOCKER_IMAGE_TAG}}
             ghcr.io/${{github.repository_owner}}/cloudflare-warp:latest
