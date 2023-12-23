@@ -19,12 +19,11 @@ jobs:
           sudo apt-get install -y --no-install-recommends cloudflare-warp
           cp /usr/bin/warp-cli /usr/bin/warp-svc .
       - name: Prepare Docker image build metadata
-        id: prepare-docker-image-build-metadata
         run: |
           DOCKER_IMAGE_TAG=$(./warp-cli --version | sed -E "s/(WARP|warp-cli) //")
           DOCKER_IMAGE_BUILD_ARG_CLOUDFLARE_WARP_VERSION=$(dpkg -s cloudflare-warp | grep "Version: " | sed "s/Version: //")
-          echo "DOCKER_IMAGE_TAG=$DOCKER_IMAGE_TAG" >> $GITHUB_OUTPUT
-          echo "DOCKER_IMAGE_BUILD_ARG_CLOUDFLARE_WARP_VERSION=$DOCKER_IMAGE_BUILD_ARG_CLOUDFLARE_WARP_VERSION" >> $GITHUB_OUTPUT
+          echo "DOCKER_IMAGE_TAG=$DOCKER_IMAGE_TAG" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE_BUILD_ARG_CLOUDFLARE_WARP_VERSION=$DOCKER_IMAGE_BUILD_ARG_CLOUDFLARE_WARP_VERSION" >> $GITHUB_ENV
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -35,8 +34,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          build-args: CLOUDFLARE_WARP_VERSION=${{steps.prepare-docker-image-build-metadata.outputs.DOCKER_IMAGE_BUILD_ARG_CLOUDFLARE_WARP_VERSION}}
+          build-args: CLOUDFLARE_WARP_VERSION=${{env.DOCKER_IMAGE_BUILD_ARG_CLOUDFLARE_WARP_VERSION}}
           push: ${{github.event_name != 'pull_request'}}
           tags: |
-            ghcr.io/${{github.repository_owner}}/cloudflare-warp:${{steps.prepare-docker-image-build-metadata.outputs.DOCKER_IMAGE_TAG}}
+            ghcr.io/${{github.repository_owner}}/cloudflare-warp:${{env.DOCKER_IMAGE_TAG}}
             ghcr.io/${{github.repository_owner}}/cloudflare-warp:latest
