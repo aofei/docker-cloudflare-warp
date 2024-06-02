@@ -22,8 +22,8 @@ jobs:
         run: |
           DOCKER_IMAGE_TAG=$(./warp-cli --version | sed -E "s/(WARP|warp-cli) //")
           DOCKER_IMAGE_BUILD_ARG_CLOUDFLARE_WARP_VERSION=$(dpkg -s cloudflare-warp | grep "Version: " | sed "s/Version: //")
-          echo "DOCKER_IMAGE_TAG=$DOCKER_IMAGE_TAG" >> $GITHUB_ENV
-          echo "DOCKER_IMAGE_BUILD_ARG_CLOUDFLARE_WARP_VERSION=$DOCKER_IMAGE_BUILD_ARG_CLOUDFLARE_WARP_VERSION" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE_TAG=${DOCKER_IMAGE_TAG}" >> ${GITHUB_ENV}
+          echo "DOCKER_IMAGE_BUILD_ARG_CLOUDFLARE_WARP_VERSION=${DOCKER_IMAGE_BUILD_ARG_CLOUDFLARE_WARP_VERSION}" >> ${GITHUB_ENV}
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
