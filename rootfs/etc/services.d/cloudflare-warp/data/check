@@ -2,8 +2,8 @@
 set -e
 function check_exit_code {
 	EXIT_CODE=$?
-	if [[ $EXIT_CODE -ne 0 ]]; then
-		echo $EXIT_CODE > /run/s6-linux-init-container-results/exitcode
+	if [[ ${EXIT_CODE} -ne 0 ]]; then
+		echo ${EXIT_CODE} > /run/s6-linux-init-container-results/exitcode
 		/run/s6/basedir/bin/halt
 	fi
 }
