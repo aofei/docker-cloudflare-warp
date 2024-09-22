@@ -1,0 +1,5 @@
+#!/bin/bash
+echo "[$(basename "$(pwd)")] starting..."
+set -e
+mkdir -p /run/dbus
+exec 2>&1 s6-notifyoncheck /usr/bin/dbus-daemon --system --nofork --nopidfile --nosyslog

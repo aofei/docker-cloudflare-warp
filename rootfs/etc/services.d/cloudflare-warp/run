@@ -1,5 +1,6 @@
-#!/usr/bin/with-contenv sh
+#!/bin/bash
 echo "[$(basename "$(pwd)")] starting..."
 set -e
+s6-svwait -U /run/service/d-bus
 rm -f /run/cloudflare-warp/warp_service
-exec 2>&1 s6-notifyoncheck /usr/local/bin/warp-svc
+exec 2>&1 s6-notifyoncheck /usr/bin/warp-svc

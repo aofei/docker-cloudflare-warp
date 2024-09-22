@@ -1,6 +1,6 @@
-#!/usr/bin/with-contenv sh
+#!/bin/bash
 set -e
-function check_exit_code {
+check_exit_code() {
 	EXIT_CODE=$?
 	if [[ ${EXIT_CODE} -ne 0 ]]; then
 		echo ${EXIT_CODE} > /run/s6-linux-init-container-results/exitcode
@@ -9,6 +9,6 @@ function check_exit_code {
 }
 trap check_exit_code EXIT
 while [[ ! -S /run/cloudflare-warp/warp_service ]]; do sleep 0.1; done
-while [[ ! -f /var/lib/cloudflare-warp/reg.json ]]; do /usr/local/bin/warp-cli --accept-tos register || sleep 5; done
-/usr/local/bin/warp-cli --accept-tos connect
+while [[ ! -f /var/lib/cloudflare-warp/reg.json ]]; do /usr/bin/warp-cli --accept-tos register || sleep 5; done
+/usr/bin/warp-cli --accept-tos connect
 while [[ ! -d /sys/class/net/CloudflareWARP ]]; do sleep 0.1; done
