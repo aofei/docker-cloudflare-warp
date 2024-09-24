@@ -40,7 +40,8 @@ jobs:
           platforms: |
             linux/amd64
             linux/arm64
-          build-args: CLOUDFLARE_WARP_VERSION=${{env.DOCKER_IMAGE_BUILD_ARG_CLOUDFLARE_WARP_VERSION}}
+          build-args: |
+            CLOUDFLARE_WARP_VERSION=${{env.DOCKER_IMAGE_BUILD_ARG_CLOUDFLARE_WARP_VERSION}}
           push: ${{github.event_name != 'pull_request'}}
           tags: |
             ghcr.io/${{github.repository_owner}}/cloudflare-warp:${{env.DOCKER_IMAGE_TAG}}
