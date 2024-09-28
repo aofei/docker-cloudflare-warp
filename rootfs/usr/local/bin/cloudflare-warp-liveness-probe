@@ -1,0 +1,3 @@
+#!/bin/sh
+set -e
+test -d /sys/class/net/CloudflareWARP
