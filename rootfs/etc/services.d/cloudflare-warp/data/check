@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/command/with-contenv bash
 set -e
 check_exit_code() {
 	EXIT_CODE=$?

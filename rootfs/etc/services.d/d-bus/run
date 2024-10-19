@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/command/with-contenv bash
 echo "[$(basename "$(pwd)")] starting..."
 set -e
 mkdir -p /run/dbus

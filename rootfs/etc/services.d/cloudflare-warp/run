@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/command/with-contenv bash
 echo "[$(basename "$(pwd)")] starting..."
 set -e
 s6-svwait -U /run/service/d-bus
