@@ -17,3 +17,4 @@ FROM debian:12-slim
 COPY --from=build / /
 COPY rootfs/ /
 ENTRYPOINT ["/init"]
+CMD ["/command/s6-pause"]
