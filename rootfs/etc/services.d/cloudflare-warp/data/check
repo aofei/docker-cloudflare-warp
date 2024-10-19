@@ -12,5 +12,6 @@ while [[ ! -S /run/cloudflare-warp/warp_service ]]; do sleep 0.1; done
 while [[ ! -f /var/lib/cloudflare-warp/reg.json ]]; do /usr/bin/warp-cli --accept-tos registration new || sleep 5; done
 /usr/bin/warp-cli --accept-tos mode "${CLOUDFLARE_WARP_MODE:-warp}"
 /usr/bin/warp-cli --accept-tos tunnel protocol set "${CLOUDFLARE_WARP_TUNNEL_PROTOCOL:-MASQUE}"
+[[ -n "${CLOUDFLARE_WARP_TUNNEL_ENDPOINT}" ]] && /usr/bin/warp-cli --accept-tos tunnel endpoint set "${CLOUDFLARE_WARP_TUNNEL_ENDPOINT}"
 /usr/bin/warp-cli --accept-tos connect
 while [[ ! -d /sys/class/net/CloudflareWARP ]]; do sleep 0.1; done
