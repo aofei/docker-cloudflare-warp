@@ -12,10 +12,13 @@ check_exit_code() {
 trap check_exit_code EXIT
 
 while [[ ! -S /run/cloudflare-warp/warp_service ]]; do sleep 0.1; done
-while [[ ! -f /var/lib/cloudflare-warp/reg.json ]]; do /usr/bin/warp-cli --accept-tos registration new || sleep 5; done
 
-/usr/bin/warp-cli --accept-tos mode "${CLOUDFLARE_WARP_MODE:-warp}"
-/usr/bin/warp-cli --accept-tos tunnel protocol set "${CLOUDFLARE_WARP_TUNNEL_PROTOCOL:-MASQUE}"
+if [[ "${CLOUDFLARE_WARP_ZEROTRUST}" != "true" ]]; then
+	while [[ ! -f /var/lib/cloudflare-warp/reg.json ]]; do /usr/bin/warp-cli --accept-tos registration new || sleep 5; done
+	
+	/usr/bin/warp-cli --accept-tos mode "${CLOUDFLARE_WARP_MODE:-warp}"
+	/usr/bin/warp-cli --accept-tos tunnel protocol set "${CLOUDFLARE_WARP_TUNNEL_PROTOCOL:-MASQUE}"
+fi
 
 for ROUTE in ${CLOUDFLARE_WARP_TUNNEL_EXCLUDED_ROUTES//,/ }; do
 	/usr/bin/warp-cli --accept-tos tunnel ip add$([[ "${ROUTE}" == */* ]] && echo "-range") "${ROUTE}"
