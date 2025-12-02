@@ -1,4 +1,4 @@
-FROM debian:12-slim AS build
+FROM debian:13-slim AS build
 
 ARG S6_OVERLAY_VERSION=3.2.0.2
 ARG CLOUDFLARE_WARP_VERSION
@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y cloudflare-warp"${CLOUDFLARE_WARP_VERSI
 RUN apt-get purge -y --auto-remove ${BUILD_ONLY_DEPS} && apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN rm -rf /tmp/* /var/tmp/*
 
-FROM debian:12-slim
+FROM debian:13-slim
 COPY --from=build / /
 COPY rootfs/ /
 ENTRYPOINT ["/init"]
